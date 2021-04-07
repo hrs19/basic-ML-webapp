@@ -1,0 +1,15 @@
+{%extends 'layout.html'%}
+
+{%block page%}
+<h2>Map</h2>
+<div class="map">
+    <h3>{{map_name[0]}}</h3>
+    <h3>{{map_name[1]}}</h3>
+    <div style="padding: 20px;">
+        {%include 'map1.html'%}
+    </div>
+    <div style="padding: 20px;">
+        {%include 'map2.html'%}
+    </div>
+</div>
+{%endblock%}
