@@ -2,9 +2,11 @@
 
 {%block page%}
 
-<h2>Model</h2>
-<h3>{{name}}</h3>
-<!-- <table>
+<!-- <h2>Model</h2> -->
+
+<a href="/return-files/{{name}}-result.csv" target="blank"><button class='btn btn-default'>Download</button></a>
+<!-- <h3>{{name}}</h3> -->
+<table>
     <tr>
     {%for header in headings%}
     <th>{{header}}</th>
@@ -16,7 +18,7 @@
         <td>{{cell}}</td>
         {%endfor%}
     </tr>
-    {%endfor%} -->
+    {%endfor%}
 </table>
 
 

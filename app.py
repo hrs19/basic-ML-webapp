@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, request, url_for
+from flask import Flask, render_template, flash, redirect, request, url_for, send_file
 from flask_wtf import FlaskForm
 from wtforms import FileField
 import pandas as pd
@@ -6,7 +6,11 @@ import os
 from flask_uploads import configure_uploads, DATA, UploadSet
 import folium
 import pickle
+import numpy as np
+
 app = Flask(__name__)
+
+model = pickle.load(open('Pickle_SVC_Model.pkl','rb'))
 
 name = 'default'
 
@@ -39,7 +43,7 @@ def index():
         print()
         filename = files.save(form.file.data)
         name = filename
-        flash("File saved.") 
+        flash("File saved.") #Ensure thsi workss
         #print(filename)
 
         return redirect(url_for('model_predict', name=filename))
@@ -49,15 +53,45 @@ def index():
 
 @app.route('/model_predict/<name>')
 def model_predict(name):
+    
     print(name)
     df = pd.read_csv(f'uploads/{name}')
     #print(df.head())
     os.remove(f'uploads/{name}')
+    # l = (len(data))
+    df =  predict(df)
     headings = list(df[:0])
     data = list(df.to_records(index=False))
-    print(data[0])
-    return render_template('model_predict.html', headings=headings, data=data)
+    name = name.split(".",1)[0]
+    df.to_csv(f'downloads/{name}-result.csv')
 
+
+    return render_template('model_predict.html', headings=headings, data=data, name=str(name))
+
+def predict(df):
+    final_features = []
+    prediction = []
+    data = list(df.to_records(index=False))
+    for i in range(len(data)):
+
+        x =  [np.array(list(data[i]))]
+        final_features.append(x)
+        y = model.predict(final_features[i])
+        prediction.append(y)
+        
+        #print(f'Result {prediction[i]}')
+    df['prediction']=prediction
+    return df
+
+# @app.route('/download')
+# def download():
+#     return render_template('')
+
+@app.route('/return-files/<filename>')
+def return_files_tut(filename):#name):
+    #filename = filename+'-result.csv'
+    file_path = 'downloads/' + filename
+    return send_file(file_path, as_attachment=True, attachment_filename='')
 
 
 @app.route('/disp_map')
